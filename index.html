@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nandhan U | Data Analyst &amp; Data Scientist — Los Santos Edition</title>
 <meta name="description" content="Grand Theft Auto V styled portfolio of Nandhan U — AI & Data Science Engineer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,24 +28,28 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   
   html {
     scroll-behavior: auto;
-    font-size: 87.5%;
+    font-size: clamp(14px, 0.25vw + 12px, 16px);
     background-color: transparent;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
   }
 
   body {
     font-family: var(--font-body);
     color: var(--text-white);
     min-height: 100svh;
-    overflow-x: hidden;
-    overscroll-behavior-y: none;
+    overflow-x: clip;
+    overscroll-behavior: none;
     background: transparent;
     cursor: none; /* Custom Reticle Cursor */
   }
+
+  img, video, canvas, svg { max-width: 100%; }
+  img, video { height: auto; object-fit: contain; }
+  h1, h2, h3, h4, p, a, li, span { overflow-wrap: anywhere; }
 
   ::selection {
     background: var(--gta-yellow);
@@ -226,6 +230,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
     padding: 18px 5vw;
     background: rgba(6, 9, 13, 0.75);
     backdrop-filter: blur(16px);
@@ -247,6 +252,8 @@
   nav ul {
     list-style: none;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 28px;
   }
   nav a {
@@ -314,6 +321,7 @@
     justify-content: center;
     padding: 140px 6vw 70px;
     position: relative;
+    min-width: 0;
   }
 
   .mission-status {
@@ -391,6 +399,7 @@
     margin-inline: auto;
     padding: 120px 6vw;
     position: relative;
+    min-width: 0;
   }
   .section > .section-head,
   .section > .about-grid,
@@ -401,6 +410,7 @@
     width: 100%;
     max-width: 78rem;
     margin-inline: auto;
+    min-width: 0;
   }
   .section-head {
     max-width: 820px;
@@ -438,8 +448,8 @@
   }
 
   /* GRIDS */
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-  .cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 30px; }
+  .cap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 24px; }
   .card-pad { padding: 32px; }
 
   .tag-gta {
@@ -495,8 +505,9 @@
     padding: 40px;
     margin-bottom: 34px;
     display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     gap: 40px;
+    min-width: 0;
   }
   .project-title {
     font-family: var(--font-heading);
