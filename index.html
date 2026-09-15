@@ -32,7 +32,7 @@
   
   html {
     scroll-behavior: auto;
-    font-size: 100%;
+    font-size: 87.5%;
     background-color: transparent;
     overscroll-behavior-y: none;
   }
@@ -554,6 +554,7 @@
   }
 
   @media (max-width: 600px) {
+    html { font-size: 81.25%; }
     header { padding: 14px 5vw; }
     .gta-logo { font-size: 1.35rem; }
 
@@ -584,6 +585,29 @@
     .project-title { font-size: 1.8rem; }
     .contact-box { padding: 40px 22px; }
     footer { padding: 28px 6vw !important; }
+  }
+
+  /* Compact scale for comfortable viewing at normal browser zoom. */
+  .hero-name { font-size: clamp(3rem, 10vw, 7rem); }
+  .hero-role { font-size: clamp(1.2rem, 2.8vw, 2rem); }
+  .section { padding-block: 88px; }
+  .section-head { margin-bottom: 36px; }
+  .section-head h2 { font-size: clamp(2.25rem, 4.8vw, 3.7rem); }
+  .card-pad { padding: 24px; }
+  .project-card { padding: 30px; gap: 28px; }
+  .contact-box { padding: 48px 32px; }
+  .gta-btn { font-size: 1.1rem; padding: 10px 22px; }
+
+  @media (max-width: 600px) {
+    .hero { padding: 112px 6vw 52px; }
+    .hero-name { font-size: clamp(2.75rem, 14vw, 4.4rem); }
+    .section { padding-block: 56px; }
+    .section-head { margin-bottom: 28px; }
+    .section-head h2 { font-size: clamp(2rem, 10vw, 3rem); }
+    .card-pad, .project-card, .chrono-card { padding: 20px; }
+    .project-title { font-size: 1.6rem; }
+    .contact-box { padding: 32px 18px; }
+    .gta-btn { font-size: 0.95rem; padding: 9px 15px; }
   }
 </style>
 </head>
