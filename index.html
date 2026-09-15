@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Nandhan U | Data Analyst &amp; Data Scientist — Los Santos Edition</title>
+<meta name="description" content="Grand Theft Auto V styled portfolio of Nandhan U — AI & Data Science Engineer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;700&family=Montserrat:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<style>
+  :root {
+    --gta-yellow: #f1a80a;
+    --gta-gold: #ffc83b;
+    --gta-orange: #f25c05;
+    --gta-hud-green: #55b357;
+    --gta-hud-red: #e74c3c;
+    --text-white: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.72);
+    --border-line: rgba(255, 255, 255, 0.15);
+    --font-heading: 'Bebas Neue', 'Oswald', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html {
+    scroll-behavior: auto;
+    font-size: 100%;
+    background-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--text-white);
+    min-height: 100svh;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    background: transparent;
+    cursor: none; /* Custom Reticle Cursor */
+  }
+
+  ::selection {
+    background: var(--gta-yellow);
+    color: #000;
+  }
+
+  /* ===== GTA RETICLE CURSOR ===== */
+  .cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: var(--gta-yellow);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 34px; height: 34px;
+    border: 1.5px solid rgba(241, 168, 10, 0.65);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+  }
+  .cursor-ring::before, .cursor-ring::after {
+    content: '';
+    position: absolute;
+    background: rgba(241, 168, 10, 0.8);
+  }
+  .cursor-ring::before { width: 100%; height: 1px; top: 50%; left: 0; }
+  .cursor-ring::after { height: 100%; width: 1px; left: 50%; top: 0; }
+  body.hovering .cursor-ring {
+    width: 52px;
+    height: 52px;
+    border-color: var(--gta-hud-green);
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  /* ===== MISSION PRELOADER / SPLASH ===== */
+  .gta-preloader {
+    position: fixed;
+    inset: 0;
+    background: #06090d;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .preloader-title {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: 0.1em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .preloader-title span { color: var(--gta-yellow); }
+  .preloader-bar-wrap {
+    width: min(400px, 80vw);
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+  .preloader-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--gta-yellow);
+    box-shadow: 0 0 12px var(--gta-yellow);
+  }
+  .preloader-status {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    margin-top: 14px;
+    text-transform: uppercase;
+  }
+
+  /* ===== FIXED GTA 5 ARTWORK BACKGROUND & GRADING ===== */
+  .bg-photo {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: -4;
+    background-image: url('ChatGPT Image Sep 14, 2026, 09_27_59 PM.png');
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+    transform: scale(1.08);
+    pointer-events: none;
+  }
+
+  .bg-grade {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background: radial-gradient(circle at 80% 20%, rgba(242, 92, 5, 0.28) 0%, rgba(5, 7, 10, 0.78) 60%, rgba(2, 3, 5, 0.94) 100%),
+                linear-gradient(180deg, rgba(3, 4, 6, 0.5) 0%, rgba(4, 6, 9, 0.72) 40%, rgba(3, 4, 6, 0.95) 100%);
+  }
+
+  .bg-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.92);
+    pointer-events: none;
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  /* HUD Top Progress Tracker */
+  .gta-progress-strip {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: var(--gta-yellow);
+    box-shadow: 0 0 10px var(--gta-yellow);
+    z-index: 1001;
+  }
+
+  /* Glassmorphic Panels */
+  .gta-glass {
+    background: rgba(12, 16, 22, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-left: 3px solid var(--gta-yellow);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-radius: 4px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    will-change: transform;
+  }
+
+  .gta-glass:hover {
+    border-color: rgba(241, 168, 10, 0.75);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 24px rgba(241, 168, 10, 0.25);
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  .hud-wanted {
+    display: inline-flex;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 1.1rem;
+  }
+  .hud-wanted span.active {
+    color: var(--gta-yellow);
+    filter: drop-shadow(0 0 7px var(--gta-yellow));
+    animation: starPulse 0.9s infinite alternate;
+  }
+  @keyframes starPulse {
+    0% { opacity: 0.7; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* NAVIGATION */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 5vw;
+    background: rgba(6, 9, 13, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 2px solid var(--border-line);
+  }
+
+  .gta-logo {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-shadow: 2px 2px 0px #000, 0 0 10px rgba(241,168,10,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .gta-logo span { color: var(--gta-yellow); }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 28px;
+  }
+  nav a {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+  nav a:hover {
+    color: var(--gta-yellow);
+    text-shadow: 0 0 8px rgba(241, 168, 10, 0.7);
+  }
+
+  /* BUTTONS */
+  .gta-btn {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 700;
+    position: relative;
+    clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+    transition: all 0.25s ease;
+  }
+  .gta-btn-primary {
+    background: var(--gta-yellow);
+    color: #0b0c0e;
+    box-shadow: 0 0 20px rgba(241, 168, 10, 0.4);
+  }
+  .gta-btn-primary:hover {
+    background: #fff;
+    color: #000;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 28px rgba(255, 255, 255, 0.6);
+  }
+  .gta-btn-outline {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-line);
+    color: #fff;
+  }
+  .gta-btn-outline:hover {
+    border-color: var(--gta-yellow);
+    color: var(--gta-yellow);
+    transform: translateY(-3px);
+  }
+
+  /* HERO */
+  .hero {
+    width: 100%;
+    max-width: 120rem;
+    min-height: 100svh;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 140px 6vw 70px;
+    position: relative;
+  }
+
+  .mission-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.85);
+    border-left: 3px solid var(--gta-hud-green);
+    margin-bottom: 24px;
+    width: fit-content;
+    text-transform: uppercase;
+  }
+  .mission-status .radar-blip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gta-hud-green);
+    box-shadow: 0 0 8px var(--gta-hud-green);
+    animation: blip 1.2s infinite;
+  }
+  @keyframes blip {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  .hero-name-wrap {
+    overflow: hidden;
+  }
+  .hero-name {
+    font-family: var(--font-heading);
+    font-size: clamp(3.8rem, 12vw, 9.2rem);
+    font-weight: 700;
+    line-height: 0.88;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 4px 4px 0px #000, 0 0 35px rgba(0, 0, 0, 0.95);
+  }
+
+  .hero-role {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+    letter-spacing: 0.18em;
+    color: var(--gta-yellow);
+    margin-top: 16px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0px #000;
+  }
+
+  .hero > .hero-cta {
+    margin-top: 12px;
+  }
+
+  .hero-hud-stats {
+    position: absolute;
+    right: 6vw;
+    bottom: 60px;
+    background: rgba(7, 10, 15, 0.85);
+    padding: 18px 24px;
+    border-left: 3px solid var(--gta-yellow);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.8;
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(12px);
+  }
+
+  /* SECTIONS */
+  .section {
+    width: 100%;
+    max-width: 120rem;
+    margin-inline: auto;
+    padding: 120px 6vw;
+    position: relative;
+  }
+  .section > .section-head,
+  .section > .about-grid,
+  .section > .cap-grid,
+  .section > .project-card,
+  .section > .chrono-card,
+  .section > .contact-box {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+  }
+  .section-head {
+    max-width: 820px;
+    margin-bottom: 54px;
+  }
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--gta-yellow);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .section-eyebrow::before {
+    content: '//';
+    color: #fff;
+    font-weight: bold;
+  }
+  .section-head h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.6rem, 5.8vw, 4.4rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+  }
+  .section-head p {
+    color: var(--text-dim);
+    margin-top: 16px;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* GRIDS */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+  .cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card-pad { padding: 32px; }
+
+  .tag-gta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--gta-yellow);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* PILLS */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .gta-pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .gta-pill-gold {
+    border-color: rgba(241, 168, 10, 0.6);
+    color: var(--gta-yellow);
+    background: rgba(241, 168, 10, 0.12);
+  }
+
+  .contact-links .gta-pill {
+    width: 124px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(241, 168, 10, 0.7);
+    border-radius: 3px;
+    color: var(--gta-yellow);
+    background: rgba(241, 168, 10, 0.12);
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .contact-links .gta-pill:hover {
+    border-color: var(--gta-yellow);
+    color: #0b0c0e;
+    background: var(--gta-yellow);
+  }
+
+  /* PROJECTS */
+  .project-card {
+    padding: 40px;
+    margin-bottom: 34px;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 40px;
+  }
+  .project-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 10px 0;
+  }
+  .checklist {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+    margin: 18px 0 24px;
+  }
+  .checklist li {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+  }
+  .checklist li::before {
+    content: '■';
+    color: var(--gta-yellow);
+    font-size: 0.8rem;
+  }
+
+  /* TIMELINE */
+  .chrono-card { padding: 30px 34px; margin-bottom: 22px; }
+  .chrono-year {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--gta-yellow);
+    letter-spacing: 0.08em;
+  }
+
+  /* CONTACT */
+  .contact-box {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 64px 40px;
+    border-left: none;
+    border-top: 4px solid var(--gta-yellow);
+  }
+
+  /* RESPONSIVENESS */
+  @media (max-width: 900px) {
+    .about-grid, .cap-grid, .project-card { grid-template-columns: 1fr; gap: 20px; }
+    .hero-hud-stats { display: none; }
+    nav { display: none; }
+    body { cursor: auto; }
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 5vw; }
+    .gta-logo { font-size: 1.35rem; }
+
+    .hero {
+      min-height: auto;
+      padding: 124px 6vw 64px;
+    }
+
+    .hero-name {
+      font-size: clamp(3.2rem, 16vw, 5rem);
+      overflow-wrap: anywhere;
+    }
+
+    .hero-role {
+      font-size: clamp(1.15rem, 5vw, 1.7rem);
+      letter-spacing: 0.1em;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .gta-btn { font-size: 1rem; padding: 11px 18px; }
+    .section { padding: 72px 6vw; }
+    .card-pad, .project-card, .chrono-card { padding: 24px; }
+    .project-title { font-size: 1.8rem; }
+    .contact-box { padding: 40px 22px; }
+    footer { padding: 28px 6vw !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom GTA Reticle -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Scroll Progress HUD -->
+<div class="gta-progress-strip" id="progressStrip"></div>
+
+<!-- Cinematic Landing Preloader -->
+<div class="gta-preloader" id="preloader">
+  <div class="preloader-title">LOS SANTOS <span>ARCHIVES</span></div>
+  <div class="preloader-bar-wrap">
+    <div class="preloader-bar" id="preloaderBar"></div>
+  </div>
+  <div class="preloader-status" id="preloaderStatus">INITIALIZING MISSION DATA...</div>
+</div>
+
+<div class="bg-photo" id="bgPhoto"></div>
+<div class="bg-grade"></div>
+<div class="bg-vignette"></div>
+<div class="scanlines"></div>
+
+<header>
+  <div class="gta-logo">GTA V <span>// FOLIO</span></div>
+  <nav>
+    <ul>
+      <li><a href="#home" class="scramble-hover">Safehouse</a></li>
+      <li><a href="#about" class="scramble-hover">Bio</a></li>
+      <li><a href="#capabilities" class="scramble-hover">Arsenal</a></li>
+      <li><a href="#projects" class="scramble-hover">Heists</a></li>
+      <li><a href="#experience" class="scramble-hover">Record</a></li>
+      <li><a href="#contact" class="scramble-hover">Contact</a></li>
+    </ul>
+  </nav>
+  <div class="hud-wanted" id="hudWanted">
+    <span class="star active">★</span>
+    <span class="star">★</span>
+    <span class="star">★</span>
+    <span class="star">★</span>
+    <span class="star">★</span>
+  </div>
+</header>
+
+<section class="hero" id="home">
+  <div class="mission-status"><span class="radar-blip"></span>AVAILABLE FOR HIRE — DATA ANALYST</div>
+  <div class="hero-name-wrap">
+    <h1 class="hero-name" id="heroTitle" data-scramble="NANDHAN U">NANDHAN U</h1>
+  </div>
+  <div class="hero-role" id="heroSub">ㅤㅤDATA ANALYST</div>
+  
+  <div class="hero-cta">
+    <a href="#projects" class="gta-btn gta-btn-primary scramble-hover">View Operations</a>
+    <a href="#about" class="gta-btn gta-btn-outline scramble-hover">Character Stats</a>
+  </div>
+
+  <div class="hero-hud-stats">
+    <div><strong>BASE:</strong> THIRUVARUR / COIMBATORE</div>
+    <div><strong>CLASS:</strong> B.TECH AI &amp; DATA SCIENCE (2026)</div>
+    <div><strong>REP:</strong> GITHUB.COM/NANDHAN-17</div>
+    <div><strong>STATUS:</strong> ARMED WITH PYTHON &amp; SQL</div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="section-head">
+    <div class="section-eyebrow">Character Dossier</div>
+    <h2 class="section-title-glitch">Engineered for Precision Analytics.</h2>
+    <p>AI & Data Science specialist turning unorganized tabular chaos into actionable corporate intelligence, operational dashboards, and predictive ML systems.</p>
+  </div>
+
+  <div class="about-grid">
+    <div class="gta-glass card-pad">
+      <div class="tag-gta">Academic Qualification</div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.8rem; margin: 8px 0;">B.Tech in Artificial Intelligence &amp; Data Science</h3>
+      <p style="color: var(--text-dim); font-size: 0.95rem;">Asian College of Engineering and Technology, Coimbatore · 2022 – 2026</p>
+      <div style="margin-top: 24px;">
+        <div class="tag-gta">Foundational Record</div>
+        <h4 style="font-family: var(--font-heading); font-size: 1.4rem;">Higher Secondary Education (HSE)</h4>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Sri Bharathidasan Matriculation Higher Secondary School · 2021 – 2022</p>
+      </div>
+    </div>
+
+    <div class="gta-glass card-pad">
+      <div class="tag-gta">Specialized Weaponry (Tech Stack)</div>
+      
+      <div style="margin-top: 14px;">
+        <span style="font-weight: 700; font-size: 0.85rem; color: #fff;">LANGUAGES &amp; CORE ANALYSIS:</span>
+        <div class="pill-row">
+          <span class="gta-pill gta-pill-gold">Python</span>
+          <span class="gta-pill">Pandas</span>
+          <span class="gta-pill">NumPy</span>
+          <span class="gta-pill">Seaborn</span>
+          <span class="gta-pill">Matplotlib</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <span style="font-weight: 700; font-size: 0.85rem; color: #fff;">DATA EXTRACTION &amp; STORAGE:</span>
+        <div class="pill-row">
+          <span class="gta-pill gta-pill-gold">SQL</span>
+          <span class="gta-pill">MySQL</span>
+          <span class="gta-pill">Firebase</span>
+          <span class="gta-pill">Complex Joins</span>
+          <span class="gta-pill">Aggregations</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <span style="font-weight: 700; font-size: 0.85rem; color: #fff;">BUSINESS INTELLIGENCE &amp; OPS:</span>
+        <div class="pill-row">
+          <span class="gta-pill gta-pill-gold">Advanced Excel</span>
+          <span class="gta-pill">Power BI</span>
+          <span class="gta-pill">Tableau</span>
+          <span class="gta-pill">XLOOKUP</span>
+          <span class="gta-pill">Power Query</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="capabilities">
+  <div class="section-head">
+    <div class="section-eyebrow">Skill Rating</div>
+    <h2 class="section-title-glitch">Operational Capabilities.</h2>
+  </div>
+  <div class="cap-grid">
+    <div class="gta-glass card-pad">
+      <div class="tag-gta">SKILL 01</div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.8rem;">Data Analytics</h3>
+      <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">Converting raw transactional dumps into executive-level dashboards using SQL, Python, and Excel for strategic decision-making.</p>
+    </div>
+    <div class="gta-glass card-pad">
+      <div class="tag-gta">SKILL 02</div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.8rem;">AI &amp; Predictive Modeling</h3>
+      <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">Deploying machine learning models, statistical pattern regression, and computer vision pipelines to solve complex system problems.</p>
+    </div>
+    <div class="gta-glass card-pad">
+      <div class="tag-gta">SKILL 03</div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.8rem;">Full Stack Architecture</h3>
+      <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">Bridging backends with FastAPI and Spring Boot to React/Next.js frontend dashboards for production-ready analytics systems.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="section-head">
+    <div class="section-eyebrow">Major Heists &amp; Contracts</div>
+    <h2 class="section-title-glitch">Featured Operations.</h2>
+  </div>
+
+  <div class="project-card gta-glass">
+    <div>
+      <div class="tag-gta">Solo Operation</div>
+      <h3 class="project-title">Data Studio for Analytics &amp; Visualization</h3>
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gta-yellow);">ROLE: CSV to Dynamic Analytics Engine</div>
+    </div>
+    <div>
+      <p style="color: var(--text-dim); font-size: 0.95rem;">Full-stack data intelligence dashboard built to process CSV datasets into interactive visual analytics with authenticated workspaces and dynamic chart generation.</p>
+      <ul class="checklist">
+        <li>Engineered reactive data ingestion pipelines with instant tabular parsing and dynamic chart synthesis.</li>
+        <li>Implemented multi-page analytics report exports and secure client workspace tracking.</li>
+      </ul>
+      <div class="pill-row">
+        <span class="gta-pill gta-pill-gold">Next.js</span>
+        <span class="gta-pill">TypeScript</span>
+        <span class="gta-pill">FastAPI</span>
+        <span class="gta-pill">SQLAlchemy</span>
+        <span class="gta-pill">Uvicorn</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-card gta-glass">
+    <div>
+      <div class="tag-gta">Syndicate Project</div>
+      <h3 class="project-title">AI Identity Verification &amp; Duty-Hours Tracker</h3>
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gta-yellow);">TARGET: Healthcare Workforce Attendance</div>
+    </div>
+    <div>
+      <p style="color: var(--text-dim); font-size: 0.95rem;">Automated surveillance and verification pipeline monitoring active shifts and biometric attendance of distributed personnel.</p>
+      <ul class="checklist">
+        <li>Built real-time telemetry and duty tracking connected to cloud datastores with sub-second sync.</li>
+        <li>Integrated computer vision AI optimization to maintain zero-fail recognition under poor lighting conditions.</li>
+      </ul>
+      <div class="pill-row">
+        <span class="gta-pill gta-pill-gold">Python OpenCV</span>
+        <span class="gta-pill">Firebase</span>
+        <span class="gta-pill">REST API</span>
+        <span class="gta-pill">SQL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="experience">
+  <div class="section-head">
+    <div class="section-eyebrow">Service Record</div>
+    <h2 class="section-title-glitch">Experience &amp; Certifications.</h2>
+  </div>
+
+  <div class="chrono-card gta-glass">
+    <div class="chrono-year">2026</div>
+    <h3>Java Full Stack Engineering — AISECT Pvt. Ltd</h3>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">Intensive engineering deployment. Designed enterprise-grade REST APIs using Spring Boot, integrated scalable relational models with MySQL, and built modular full-stack mini applications.</p>
+  </div>
+
+  <div class="chrono-card gta-glass">
+    <div class="chrono-year">2026</div>
+    <h3>Artificial Intelligence Research Intern — NOVITECH R&amp;D</h3>
+    <p style="color: var(--text-dim); font-size: 0.92rem;">Engineered practical AI models, automated verification workflows, and predictive statistical pipelines for real-world enterprise deployments.</p>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="contact-box gta-glass">
+    <div class="section-eyebrow" style="justify-content: center;">Open Comms</div>
+    <h2 style="font-family: var(--font-heading); font-size: clamp(2.5rem, 6vw, 3.8rem); text-transform: uppercase;">Ready For The Next Contract.</h2>
+    <p style="color: var(--text-dim); margin-top: 10px;">Available for entry-level Data Analyst, BI Developer, and Junior Data Scientist roles worldwide.</p>
+    
+    <div class="hero-cta" style="justify-content: center;">
+      <a href="mailto:nandhanudhayakumar@gmail.com" class="gta-btn gta-btn-primary scramble-hover">Transmit Email</a>
+      <a href="tel:+916374983667" class="gta-btn gta-btn-outline scramble-hover">Secure Line (Phone)</a>
+    </div>
+
+    <div class="contact-links" style="display:flex; justify-content:center; gap:16px; margin-top:36px; flex-wrap:wrap;">
+      <a href="https://linkedin.com/in/nandhan-ai" target="_blank" class="gta-pill gta-pill-gold">LinkedIn</a>
+      <a href="https://github.com/Nandhan-17" target="_blank" class="gta-pill gta-pill-gold">GitHub</a>
+      <a href="https://stark-analytics-eta.vercel.app/" target="_blank" class="gta-pill">Live Project</a>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align: center; padding: 40px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); border-top: 1px solid var(--border-line);">
+  <div>NANDHAN U — LOCATION // THIRUVARUR</div>
+  <div style="margin-top: 6px; color: var(--gta-yellow);">MISSION PASSED: RESPECT +</div>
+</footer>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  // 1. Lenis Smooth Scroll Setup
+  const useSmoothScroll = window.matchMedia('(min-width: 901px)').matches;
+  const lenis = useSmoothScroll ? new Lenis({
+    autoRaf: false,
+    duration: 1.2,
+    smoothWheel: true,
+    syncTouch: false,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+  }) : null;
+  if (lenis) {
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+  }
+  gsap.ticker.lagSmoothing(0);
+
+  // 2. Custom Reticle Cursor Movement
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  window.addEventListener('mousemove', (e) => {
+    gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.08 });
+    gsap.to(ring, { x: e.clientX, y: e.clientY, duration: 0.22, ease: "power2.out" });
+  });
+  document.querySelectorAll('a, button, .gta-glass').forEach(target => {
+    target.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    target.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+
+  // 3. Text Decryption / Scramble Animation Engine
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  function scrambleText(element, finalText, speed = 30) {
+    let iteration = 0;
+    clearInterval(element.interval);
+    element.interval = setInterval(() => {
+      element.innerText = finalText
+        .split("")
+        .map((char, index) => {
+          if (index < iteration) return finalText[index];
+          if (char === " ") return " ";
+          return letters[Math.floor(Math.random() * letters.length)];
+        })
+        .join("");
+      if (iteration >= finalText.length) clearInterval(element.interval);
+      iteration += 1 / 2;
+    }, speed);
+  }
+
+  document.querySelectorAll('.scramble-hover').forEach(el => {
+    const raw = el.innerText.trim();
+    el.addEventListener('mouseenter', () => scrambleText(el, raw, 20));
+  });
+
+  // 4. Cinematic Preloader Sequence
+  const preloaderBar = document.getElementById('preloaderBar');
+  const preloaderStatus = document.getElementById('preloaderStatus');
+  const preloader = document.getElementById('preloader');
+
+  const loadTL = gsap.timeline({
+    onComplete: () => {
+      // Hero Entrance
+      scrambleText(document.getElementById('heroTitle'), "NANDHAN U", 35);
+      gsap.from("#heroTitle", { duration: 1.4, y: 100, opacity: 0, ease: "power4.out" });
+      gsap.from("#heroSub", { duration: 1.2, delay: 0.25, y: 30, opacity: 0, ease: "power3.out" });
+      gsap.from(".hero-cta", { duration: 1.2, delay: 0.45, y: 20, opacity: 0, ease: "power3.out" });
+      gsap.from(".hero-hud-stats", { duration: 1.2, delay: 0.6, x: 40, opacity: 0, ease: "power3.out" });
+    }
+  });
+
+  loadTL
+    .to(preloaderBar, { width: "100%", duration: 1.6, ease: "power2.inOut" })
+    .call(() => {
+      preloaderStatus.textContent = "AUTHORIZED // WELCOME TO LOS SANTOS";
+    }, null, "-=0.3")
+    .to(preloader, { yPercent: -100, duration: 0.9, ease: "power4.inOut" });
+
+  // 5. Scroll Progress Bar & Dynamic Wanted Stars
+  const stars = document.querySelectorAll('#hudWanted .star');
+  const updateScrollHud = ({ scroll, limit }) => {
+    const scrolled = limit === 0 ? 0 : (scroll / limit) * 100;
+    document.getElementById('progressStrip').style.width = scrolled + "%";
+
+    // Wanted Level Escalation based on scroll
+    const starIndex = Math.min(5, Math.floor(scrolled / 20) + 1);
+    stars.forEach((star, idx) => {
+      if (idx < starIndex) star.classList.add('active');
+      else star.classList.remove('active');
+    });
+  };
+  if (lenis) {
+    lenis.on('scroll', updateScrollHud);
+  } else {
+    window.addEventListener('scroll', () => updateScrollHud({
+      scroll: window.scrollY,
+      limit: document.documentElement.scrollHeight - window.innerHeight
+    }), { passive: true });
+  }
+
+  // 6. ScrollTrigger Card Reveals with 3D Skew
+  gsap.utils.toArray('.gta-glass').forEach(card => {
+    gsap.from(card, {
+      scrollTrigger: {
+        trigger: card,
+        start: "top 86%",
+      },
+      y: 55,
+      opacity: 0,
+      skewY: 2,
+      duration: 0.9,
+      ease: "power3.out"
+    });
+  });
+
+  // 8. Section Head Reveal on View
+  gsap.utils.toArray('.section-title-glitch').forEach(title => {
+    gsap.from(title, {
+      scrollTrigger: {
+        trigger: title,
+        start: "top 85%",
+        once: true
+      },
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out"
+    });
+  });
+</script>
+
+</body>
+</html>
